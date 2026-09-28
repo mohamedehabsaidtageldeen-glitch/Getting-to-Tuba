@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>اللغات</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#F6F4EE;--surface:#FFF;--ink:#22301F;--ink-soft:#5C6B57;--line:#DCE0D2;--accent:#3F6B4A;--accent-soft:#E4EDDE;--danger:#B4543F}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Tajawal',sans-serif;display:flex;justify-content:center;padding:28px 16px 90px;min-height:100vh}
+  .page{width:100%;max-width:520px}
+  h1{font-size:26px;font-weight:900;margin:0 0 4px}.sub{font-size:13px;color:var(--ink-soft);margin-bottom:14px}
+  h2{font-size:15px;margin:22px 0 10px}
+  .tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto}
+  .tabs button{flex:1;padding:10px 6px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .tabs button.on{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px}
+  .head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .name{font-size:16px;font-weight:700}.native{font-size:12.5px;color:var(--ink-soft)}
+  select,input{padding:9px 11px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-family:inherit;font-size:14px}
+  .row{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+  .bar{height:8px;border-radius:999px;background:var(--bg);border:1px solid var(--line);overflow:hidden;flex:1;min-width:80px}
+  .bar div{height:100%;background:var(--accent)}
+  button{font-family:inherit;cursor:pointer}
+  .chip{padding:7px 12px;border-radius:999px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);font-size:12.5px;font-weight:700}
+  .add{padding:10px 14px;border-radius:10px;border:none;background:var(--accent);color:var(--bg);font-weight:700;font-size:13.5px}
+  .rm{background:none;border:none;color:var(--ink-soft);font-size:16px}.rm:hover{color:var(--danger)}
+  .stat{font-size:12.5px;color:var(--ink-soft)}
+  .pool{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .pool .card{margin:0;display:flex;flex-direction:column;gap:8px}
+  .sums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+  .sums div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 6px;text-align:center}
+  .sums b{display:block;font-size:20px;color:var(--accent)}.sums small{font-size:11.5px;color:var(--ink-soft)}
+  .form{display:flex;flex-direction:column;gap:8px}.form input,.form select{width:100%}
+  .word{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .word:last-child{border:none}.word b{direction:ltr;unicode-bidi:embed}
+  .flash{text-align:center;padding:34px 16px}
+  .flash .big{font-size:32px;font-weight:900;direction:ltr;margin:10px 0}
+  .flash .ans{font-size:20px;color:var(--accent);min-height:30px;margin-bottom:16px}
+  .two{display:flex;gap:8px}.two button{flex:1;padding:13px;border-radius:12px;border:none;font-size:15px;font-weight:700}
+  .yes{background:var(--accent);color:var(--bg)}.no{background:var(--danger);color:#fff}
+  .plan label{display:flex;gap:10px;align-items:flex-start;padding:9px 0;font-size:14.5px;line-height:1.5;cursor:pointer}
+  .plan input{accent-color:var(--accent);width:18px;height:18px;margin-top:2px;flex:none}
+  .plan label.d span{color:var(--ink-soft);text-decoration:line-through}
+  .empty{text-align:center;color:var(--ink-soft);font-size:14px;padding:30px 10px;border:1px dashed var(--line);border-radius:10px}
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>اللغات 🌍</h1>
+  <div class="sub">مستواك، مفرداتك، مراجعتك اليومية، وخطتك لكل لغة</div>
+  <div class="tabs" id="tabs"></div>
+  <div id="view"></div>
+</div>
+<script src="shared.js"></script>
+<script>
+  const LV=['بادئ','A1','A2','B1','B2','C1','C2'];
+  const L=[['tr','التركية','Türkçe'],['en','الإنجليزية','English'],['es','الإسبانية','Español'],['fr','الفرنسية','Français'],['de','الألمانية','Deutsch'],['it','الإيطالية','Italiano'],['pt','البرتغالية','Português'],['ru','الروسية','Русский'],['zh','الصينية','中文'],['ja','اليابانية','日本語'],['ko','الكورية','한국어'],['hi','الهندية','हिन्दी'],['ur','الأردية','اردو'],['fa','الفارسية','فارسی'],['id','الإندونيسية','Indonesia'],['nl','الهولندية','Nederlands'],['sv','السويدية','Svenska'],['pl','البولندية','Polski'],['el','اليونانية','Ελληνικά'],['he','العبرية','עברית'],['uk','الأوكرانية','Українська'],['vi','الفيتنامية','Tiếng Việt'],['th','التايلندية','ไทย'],['sw','السواحيلية','Kiswahili']];
+  const TR_START='merhaba|مرحبا;selam|أهلا;günaydın|صباح الخير;iyi akşamlar|مساء الخير;iyi geceler|تصبح على خير;teşekkürler|شكرا;lütfen|من فضلك;evet|نعم;hayır|لا;tamam|حسنا;özür dilerim|آسف;nasılsın|كيف حالك;iyiyim|أنا بخير;adım|اسمي;su|ماء;ekmek|خبز;ev|بيت;okul|مدرسة;kitap|كتاب;arkadaş|صديق;aile|عائلة;gün|يوم;gece|ليل;bugün|اليوم;yarın|غدا;dün|أمس;ben|أنا;sen|أنت;biz|نحن;güzel|جميل;büyük|كبير;küçük|صغير;çok|كثير;az|قليل;nerede|أين;ne|ماذا;kim|من;neden|لماذا;nasıl|كيف';
+  const IV=[0,1,2,4,8,16];
+  const PLANS={
+    tr:{
+      A1:['تعلّم الحروف والنطق (ı, ö, ü, ç, ş, ğ)','اتعلم تعرّف بنفسك: Benim adım Muhammed','الأرقام من 1 لـ 100 والأيام والشهور','التحيات والجمل اليومية الأساسية','ضمائر الفاعل (ben, sen, o) وفعل الكينونة','مراجعة 10 كلمات جديدة كل يوم','تسمع 10 دقايق تركي يوميًا حتى لو مش فاهم كله'],
+      A2:['الزمن الحاضر والماضي البسيط','حالات الاسم (yönelme, bulunma, çıkma)','تكلم عن يومك وعيلتك وشغلك بجمل بسيطة','فيديوهات تركية بطيئة أو تعليمية بدون ترجمة','500 كلمة تركية أساسية على الأقل','اكتب فقرة قصيرة عن نفسك بالتركي'],
+      B1:['المستقبل والمضارع المستمر وصيغ الشرط','تتفرج على محتوى تركي بسيط مع ترجمة تركية','تحكي موقف حصل معاك من غير ما تبص في الورقة','تقرا أخبار سهلة أو مقالات قصيرة','1500 كلمة تقريبًا','تكلم مع شخص تركي ولو 10 دقايق'],
+      B2:['تعمل Presentation بالتركي','تكتب رسالة رسمية أو إيميل','تفهم أغلب المسلسلات والفيديوهات بدون ترجمة','تناقش رأيك في موضوع بجمل مركبة','حل نماذج امتحانات اللغة (TÖMER / Yunus Emre)'],
+      C:['تقرا كتب ومقالات حقيقية','تتناقش في مواضيع مجردة','تكتب مقال منظم بالتركي']
+    },
+    gen:{
+      A1:['اتعلم الحروف والنطق','تعرّف بنفسك وتسأل أسئلة بسيطة','الأرقام والأيام والتحيات','50 كلمة أساسية','تسمع 10 دقايق يوميًا'],
+      A2:['جمل عن يومك وعيلتك وشغلك','الماضي والمستقبل البسيط','300 كلمة','تتفرج على محتوى بسيط للمبتدئين'],
+      B1:['تحكي موقف حصل معاك','تقرا أخبار سهلة','1000 كلمة','تتكلم مع شخص أجنبي 10 دقايق'],
+      B2:['تناقش رأيك في موضوع','تكتب رسالة رسمية','تفهم فيديوهات بدون ترجمة'],
+      C:['تقرا كتب حقيقية','تتناقش في مواضيع مجردة','تكتب مقال منظم']
+    }
+  };
+  const rd=(k,f)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?f:v}catch(e){return f}};
+  const wr=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+  let data=rd('languages-data',{tr:{on:1,lv:0,words:0,mins:0,goal:'B2'},en:{on:1,lv:2,words:0,mins:0,goal:'C1'}});
+  let vocab=rd('languages-vocab',{}),log=rd('languages-log',{}),plan=rd('languages-plan',{});
+  const save=()=>wr('languages-data',data),saveV=()=>wr('languages-vocab',vocab),saveL=()=>wr('languages-log',log),saveP=()=>wr('languages-plan',plan);
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const today=iso(new Date());
+  const addDays=n=>{const d=new Date();d.setDate(d.getDate()+n);return iso(d)};
+  const fm=m=>m>=60?Math.floor(m/60)+'س'+(m%60?' '+m%60+'د':''):m+'د';
+  const nm=c=>L.find(x=>x[0]===c)[1];
+  const actives=()=>L.map(x=>x[0]).filter(c=>data[c]&&data[c].on);
+  let tab='mine',selLang=actives()[0]||'tr',rv={q:[],i:0,show:false};
+
+  function logMin(c,m){log[today]=log[today]||{};log[today][c]=(log[today][c]||0)+m;saveL()}
+  function todayMins(c){const t=log[today]||{};return c?(t[c]||0):Object.keys(t).filter(k=>k[0]!=='_').reduce((s,k)=>s+t[k],0)}
+  function streak(){let s=0,d=new Date();const has=x=>log[iso(x)]&&Object.keys(log[iso(x)]).length;if(!has(d))d.setDate(d.getDate()-1);while(has(d)){s++;d.setDate(d.getDate()-1)}return s}
+  function totalCards(){return Object.values(vocab).reduce((s,a)=>s+a.length,0)}
+  function dueCards(){const q=[];Object.keys(vocab).forEach(c=>vocab[c].forEach(o=>{if(o.due<=today)q.push({c,o})}));return q}
+
+  function renderTabs(){
+    const T=[['mine','لغاتي'],['vocab','المفردات'],['review','مراجعة ('+dueCards().length+')'],['plan','الخطة']];
+    $('tabs').innerHTML='';
+    T.forEach(([k,l])=>{const b=document.createElement('button');b.textContent=l;if(k===tab)b.className='on';
+      b.onclick=()=>{tab=k;if(k==='review'){rv={q:dueCards(),i:0,show:false}}render()};$('tabs').appendChild(b)});
+  }
+  function langSelect(){
+    const a=actives();if(!a.includes(selLang))selLang=a[0]||'tr';
+    return '<select id="lsel" style="width:100%;margin-bottom:12px">'+a.map(c=>'<option value="'+c+'"'+(c===selLang?' selected':'')+'>'+nm(c)+'</option>').join('')+'</select>';
+  }
+  function bindSel(){const s=$('lsel');if(s)s.onchange=e=>{selLang=e.target.value;render()}}
+
+  function viewMine(){
+    const v=$('view');
+    let h='<div class="sums"><div><b>'+streak()+'🔥</b><small>أيام استمرار</small></div><div><b>'+fm(todayMins())+'</b><small>وقت النهارده</small></div><div><b>'+totalCards()+'</b><small>كلمة في المفردات</small></div></div><div id="act"></div><h2>لغات تانية تقدر تضيفها</h2><div class="pool" id="pool"></div>';
+    v.innerHTML=h;const a=$('act'),p=$('pool');
+    L.forEach(([c,ar,nat])=>{
+      const d=data[c];
+      if(d&&d.on){
+        const el=document.createElement('div');el.className='card';
+        const pct=Math.round(d.lv/6*100),g=d.goalMin||30,tm=todayMins(c),gp=Math.min(100,tm/g*100);
+        el.innerHTML='<div class="head"><div><div class="name">'+ar+'</div><div class="native">'+nat+'</div></div><button class="rm" title="إيقاف">✕</button></div>'+
+        '<div class="row"><span class="stat">المستوى:</span><select class="lv">'+LV.map((x,i)=>'<option value="'+i+'"'+(i==d.lv?' selected':'')+'>'+x+'</option>').join('')+'</select><div class="bar"><div style="width:'+pct+'%"></div></div></div>'+
+        '<div class="row"><span class="stat">هدف المستوى:</span><select class="gl">'+LV.slice(1).map(x=>'<option'+(x===d.goal?' selected':'')+'>'+x+'</option>').join('')+'</select></div>'+
+        '<div class="row"><span class="stat">النهارده: <b>'+fm(tm)+'</b> من '+g+'د</span><div class="bar"><div style="width:'+gp+'%"></div></div></div>'+
+        '<div class="row"><span class="stat">إجمالي الوقت: <b>'+fm(d.mins)+'</b></span><button class="chip" data-m="15">+15د</button><button class="chip" data-m="30">+30د</button><button class="chip" data-m="60">+1س</button></div>'+
+        '<div class="row"><span class="stat">كلمات: <b>'+d.words+'</b></span><button class="chip" data-w="10">+10</button><button class="chip" data-w="50">+50</button><span class="stat" style="margin-right:auto">هدف يومي:</span><select class="gm">'+[15,30,45,60,90].map(x=>'<option value="'+x+'"'+(x===g?' selected':'')+'>'+x+'د</option>').join('')+'</select></div>';
+        el.querySelector('.lv').onchange=e=>{d.lv=+e.target.value;save();render()};
+        el.querySelector('.gl').onchange=e=>{d.goal=e.target.value;save()};
+        el.querySelector('.gm').onchange=e=>{d.goalMin=+e.target.value;save();render()};
+        el.querySelector('.rm').onclick=()=>{d.on=0;save();render()};
+        el.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{d.words+=+b.dataset.w;save();render()});
+        el.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{d.mins+=+b.dataset.m;logMin(c,+b.dataset.m);save();render()});
+        a.appendChild(el);
+      }else{
+        const el=document.createElement('div');el.className='card';
+        el.innerHTML='<div><div class="name">'+ar+'</div><div class="native">'+nat+'</div></div><button class="add">فعّل</button>';
+        el.querySelector('button').onclick=()=>{data[c]=Object.assign({lv:0,words:0,mins:0,goal:'B2'},d,{on:1});save();render()};
+        p.appendChild(el);
+      }
+    });
+  }
+
+  function viewVocab(){
+    const v=$('view');
+    if(!actives().length){v.innerHTML='<div class="empty">فعّل لغة الأول من تبويب لغاتي</div>';return}
+    const list=vocab[selLang]||[];
+    v.innerHTML=langSelect()+'<div class="card form"><input id="w" placeholder="الكلمة بلغتها" dir="ltr"><input id="m" placeholder="المعنى بالعربي"><button class="add" id="ad">إضافة كلمة</button>'+
+      (selLang==='tr'?'<button class="chip" id="imp">استيراد 37 كلمة تركية أساسية</button>':'')+'</div><div class="stat" style="margin-bottom:8px">'+list.length+' كلمة</div><div class="card" id="wl"></div>';
+    bindSel();
+    const wl=$('wl');
+    if(!list.length)wl.innerHTML='<div class="empty" style="border:none">لسه مفيش كلمات، ضيف أول كلمة</div>';
+    list.slice().reverse().forEach(o=>{
+      const r=document.createElement('div');r.className='word';
+      r.innerHTML='<div><b>'+esc(o.w)+'</b> — '+esc(o.m)+'</div><button class="rm">✕</button>';
+      r.querySelector('.rm').onclick=()=>{vocab[selLang]=list.filter(x=>x!==o);saveV();render()};
+      wl.appendChild(r);
+    });
+    const add=()=>{
+      const w=$('w').value.trim(),m=$('m').value.trim();if(!w||!m)return;
+      (vocab[selLang]=vocab[selLang]||[]).push({w,m,b:0,due:today});
+      data[selLang].words=(data[selLang].words||0)+1;save();saveV();render();
+    };
+    $('ad').onclick=add;$('m').onkeydown=e=>{if(e.key==='Enter')add()};
+    const imp=$('imp');if(imp)imp.onclick=()=>{
+      const cur=vocab.tr=vocab.tr||[];let n=0;
+      TR_START.split(';').forEach(s=>{const[w,m]=s.split('|');if(!cur.some(x=>x.w===w)){cur.push({w,m,b:0,due:today});n++}});
+      data.tr.words=(data.tr.words||0)+n;save();saveV();render();
+    };
+  }
+
+  function viewReview(){
+    const v=$('view');
+    if(!totalCards()){v.innerHTML='<div class="empty">ضيف كلمات من تبويب المفردات الأول، وبعدين ترجع هنا تراجعها</div>';return}
+    if(rv.i>=rv.q.length){
+      v.innerHTML='<div class="card flash"><div style="font-size:42px">🎉</div><div class="name">'+(rv.q.length?'خلصت مراجعة النهارده!':'مفيش كلمات مستحقة للمراجعة دلوقتي')+'</div><div class="stat" style="margin-top:8px">الكلمات بترجع لك تلقائي في الميعاد المناسب</div></div>';return}
+    const it=rv.q[rv.i];
+    v.innerHTML='<div class="stat" style="margin-bottom:8px">'+(rv.i+1)+' من '+rv.q.length+' • '+nm(it.c)+'</div><div class="card flash"><div class="big">'+esc(it.o.w)+'</div><div class="ans">'+(rv.show?esc(it.o.m):'')+'</div>'+
+      (rv.show?'<div class="two"><button class="no" id="no">لسه ❌</button><button class="yes" id="yes">عرفتها ✅</button></div>':'<button class="add" id="sh" style="width:100%">أظهر المعنى</button>')+'</div>';
+    if(!rv.show){$('sh').onclick=()=>{rv.show=true;viewReview()};return}
+    const ans=ok=>{
+      if(ok){it.o.b=Math.min(5,it.o.b+1);it.o.due=addDays(IV[it.o.b])}
+      else{it.o.b=0;it.o.due=today;rv.q.push(it)}
+      log[today]=log[today]||{};log[today]._r=(log[today]._r||0)+1;saveL();saveV();
+      rv.i++;rv.show=false;viewReview();renderTabs();
+    };
+    $('yes').onclick=()=>ans(true);$('no').onclick=()=>ans(false);
+  }
+
+  function viewPlan(){
+    const v=$('view');
+    if(!actives().length){v.innerHTML='<div class="empty">فعّل لغة الأول من تبويب لغاتي</div>';return}
+    const d=data[selLang],lv=d.lv,key=lv<=1?'A1':lv===2?'A2':lv===3?'B1':lv===4?'B2':'C';
+    const items=(PLANS[selLang]||PLANS.gen)[key];
+    const done=items.filter((_,i)=>plan[selLang+'-'+key+'-'+i]).length,pct=Math.round(done/items.length*100);
+    v.innerHTML=langSelect()+'<div class="card"><div class="head"><div class="name">خطة مستوى '+(key==='C'?'C1+':key)+'</div><span class="stat">'+pct+'%</span></div><div class="row"><div class="bar"><div style="width:'+pct+'%"></div></div></div><div class="plan" id="pl"></div></div>'+
+      (selLang==='tr'?'':'<div class="stat">الخطة دي عامة لأي لغة. الخطة التفصيلية موجودة للتركي دلوقتي.</div>');
+    bindSel();
+    items.forEach((t,i)=>{
+      const k=selLang+'-'+key+'-'+i,lb=document.createElement('label');lb.className=plan[k]?'d':'';
+      lb.innerHTML='<input type="checkbox"'+(plan[k]?' checked':'')+'><span>'+esc(t)+'</span>';
+      lb.querySelector('input').onchange=e=>{plan[k]=e.target.checked;saveP();render()};
+      $('pl').appendChild(lb);
+    });
+  }
+
+  function render(){
+    renderTabs();
+    ({mine:viewMine,vocab:viewVocab,review:viewReview,plan:viewPlan})[tab]();
+  }
+  render();
+</script>
+</body>
+</html>

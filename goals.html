@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الأهداف</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F6F4EE;
+    --surface: #FFFFFF;
+    --ink: #22301F;
+    --ink-soft: #5C6B57;
+    --line: #DCE0D2;
+    --accent: #3F6B4A;
+    --accent-soft: #E4EDDE;
+    --danger: #B4543F;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Tajawal', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 28px 16px 60px;
+    min-height: 100vh;
+  }
+  .page { width: 100%; max-width: 520px; }
+  .back { font-size: 13px; color: var(--ink-soft); text-decoration: none; display: inline-block; margin-bottom: 10px; }
+  .top { margin-bottom: 16px; }
+  .top h1 { font-size: 26px; font-weight: 900; margin: 0 0 4px; }
+  .top .sub { font-size: 13px; color: var(--ink-soft); }
+
+  .form {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .form input, .form textarea, .form select {
+    padding: 12px 13px;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 14.5px;
+    width: 100%;
+  }
+  .form textarea { resize: vertical; min-height: 44px; }
+  .form input:focus, .form textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .form .row { display: flex; gap: 8px; }
+  .form .row > * { flex: 1; }
+  .form button {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 9px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .filters { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .filters button {
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink-soft);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .filters button.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+
+  .stat-label { font-size: 12.5px; color: var(--ink-soft); margin-bottom: 10px; }
+
+  ul.goals { list-style: none; margin: 0 0 20px; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+  .goal {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+  }
+  .goal.complete { border-color: var(--accent); background: var(--accent-soft); }
+  .goal .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .goal .name { font-size: 15.5px; font-weight: 700; }
+  .goal .tag {
+    font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px;
+    white-space: nowrap; background: var(--accent-soft); color: var(--accent);
+  }
+  .goal.complete .tag { background: var(--surface); }
+  .goal .due { font-size: 12.5px; color: var(--ink-soft); margin: 6px 0; }
+  .goal .note { font-size: 13.5px; color: var(--ink-soft); margin: 6px 0 10px; line-height: 1.5; }
+
+  .progress-wrap { display: flex; align-items: center; gap: 10px; margin: 10px 0 8px; }
+  .progress-bar {
+    flex: 1; height: 9px; background: var(--bg);
+    border: 1px solid var(--line); border-radius: 999px; overflow: hidden;
+  }
+  .progress-bar .fill { height: 100%; background: var(--accent); border-radius: 999px; }
+  .progress-pct { font-size: 13px; font-weight: 700; color: var(--accent); width: 38px; text-align: left; }
+  .slider-row input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+  .log-section { margin-top: 10px; border-top: 1px dashed var(--line); padding-top: 10px; }
+  .log-add { display: flex; gap: 6px; margin-bottom: 8px; }
+  .log-add input {
+    flex: 1; padding: 9px 11px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+    font-family: inherit; font-size: 13px;
+  }
+  .log-add button {
+    background: var(--ink); color: var(--bg); border: none; border-radius: 8px;
+    padding: 0 12px; font-family: inherit; font-size: 13px; cursor: pointer;
+  }
+  .log-entry { font-size: 12.5px; color: var(--ink-soft); margin-bottom: 4px; line-height: 1.5; }
+  .log-entry .log-date { font-weight: 700; color: var(--ink); }
+  .log-more { font-size: 12px; color: var(--ink-soft); }
+
+  .foot { display: flex; justify-content: flex-end; margin-top: 6px; }
+  .del { background: none; border: none; color: var(--ink-soft); font-size: 16px; cursor: pointer; padding: 4px; line-height: 1; }
+  .del:hover { color: var(--danger); }
+
+  .empty {
+    text-align: center; color: var(--ink-soft); font-size: 14px;
+    padding: 40px 10px; border: 1px dashed var(--line); border-radius: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <a class="back" href="index.html">← الصفحة الرئيسية</a>
+  <div class="top">
+    <h1>الأهداف</h1>
+    <div class="sub">اكتب هدفك، تابع تقدمك، وسجّل اللي عملته فيه</div>
+  </div>
+
+  <div class="form">
+    <input id="nameInput" type="text" placeholder="الهدف (مثلاً: أوصل A2 في التركي)" />
+    <textarea id="noteInput" placeholder="تفاصيل أو خطوات (اختياري)"></textarea>
+    <div class="row">
+      <input id="dateInput" type="date" />
+      <select id="categorySelect">
+        <option value="عام">عام</option>
+        <option value="دراسة">دراسة</option>
+        <option value="لغة">لغة</option>
+        <option value="تصميم">تصميم</option>
+        <option value="برمجة">برمجة</option>
+      </select>
+    </div>
+    <button id="addBtn">إضافة هدف</button>
+  </div>
+
+  <div class="filters" id="goalFilters">
+    <button class="active" data-cat="all">الكل</button>
+    <button data-cat="دراسة">دراسة</button>
+    <button data-cat="لغة">لغة</button>
+    <button data-cat="تصميم">تصميم</button>
+    <button data-cat="برمجة">برمجة</button>
+  </div>
+
+  <div class="stat-label" id="statLabel"></div>
+  <ul class="goals" id="goalList"></ul>
+  <div class="empty" id="emptyMsg" style="display:none;">لسه معملتش أي هدف، ابدأ بكتابة أول هدف ليك</div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'goals-data';
+  const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+
+  let goals = [];
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    goals = saved ? JSON.parse(saved) : [];
+  } catch (e) { goals = []; }
+
+  let currentFilter = 'all';
+
+  const listEl = document.getElementById('goalList');
+  const emptyEl = document.getElementById('emptyMsg');
+  const nameInput = document.getElementById('nameInput');
+  const noteInput = document.getElementById('noteInput');
+  const dateInput = document.getElementById('dateInput');
+  const categorySelect = document.getElementById('categorySelect');
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(goals)); } catch (e) {}
+  }
+
+  function formatDate(iso) {
+    const d = new Date(iso + 'T00:00:00');
+    return d.getDate() + ' ' + months[d.getMonth()];
+  }
+
+  function todayISO() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function render() {
+    listEl.innerHTML = '';
+    if (goals.length === 0) {
+      emptyEl.style.display = 'block';
+      document.getElementById('statLabel').textContent = '';
+      return;
+    }
+    emptyEl.style.display = 'none';
+    const complete = goals.filter(g => g.progress >= 100).length;
+    document.getElementById('statLabel').textContent = complete + ' هدف خلصان من ' + goals.length;
+
+    let visible = goals.filter(g => currentFilter === 'all' || (g.category || 'عام') === currentFilter);
+    visible = visible.slice().sort((a, b) => (a.progress >= 100) - (b.progress >= 100));
+
+    if (visible.length === 0) {
+      const li = document.createElement('li');
+      li.className = 'empty';
+      li.textContent = 'مفيش أهداف في التصنيف ده';
+      listEl.appendChild(li);
+      return;
+    }
+
+    visible.forEach((g) => {
+      const i = goals.indexOf(g);
+      g.logs = g.logs || [];
+      const li = document.createElement('li');
+      li.className = 'goal' + (g.progress >= 100 ? ' complete' : '');
+      li.innerHTML = `
+        <div class="head">
+          <div class="name"></div>
+          <span class="tag"></span>
+        </div>
+        ${g.due ? '<div class="due"></div>' : ''}
+        ${g.note ? '<div class="note"></div>' : ''}
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="fill" style="width:${g.progress}%"></div></div>
+          <div class="progress-pct">${g.progress}%</div>
+        </div>
+        <div class="slider-row">
+          <input type="range" min="0" max="100" step="5" value="${g.progress}" />
+        </div>
+        <div class="log-section">
+          <div class="log-add">
+            <input type="text" class="log-input" placeholder="سجّل اللي عملته النهارده في الهدف ده..." />
+            <button class="log-btn">سجّل</button>
+          </div>
+          <div class="log-list"></div>
+        </div>
+        <div class="foot"><button class="del" aria-label="حذف الهدف">✕</button></div>
+      `;
+      li.querySelector('.name').textContent = g.name;
+      li.querySelector('.tag').textContent = g.category || 'عام';
+      if (g.due) li.querySelector('.due').textContent = 'الميعاد المستهدف: ' + formatDate(g.due);
+      if (g.note) li.querySelector('.note').textContent = g.note;
+
+      const logList = li.querySelector('.log-list');
+      const recent = g.logs.slice().reverse().slice(0, 3);
+      recent.forEach(l => {
+        const row = document.createElement('div');
+        row.className = 'log-entry';
+        const d = document.createElement('span');
+        d.className = 'log-date';
+        d.textContent = formatDate(l.date) + ': ';
+        row.appendChild(d);
+        row.appendChild(document.createTextNode(l.text));
+        logList.appendChild(row);
+      });
+      if (g.logs.length > 3) {
+        const more = document.createElement('div');
+        more.className = 'log-more';
+        more.textContent = '+ ' + (g.logs.length - 3) + ' تسجيلات أقدم';
+        logList.appendChild(more);
+      }
+
+      const slider = li.querySelector('input[type="range"]');
+      slider.oninput = (e) => {
+        g.progress = parseInt(e.target.value, 10);
+        li.querySelector('.fill').style.width = g.progress + '%';
+        li.querySelector('.progress-pct').textContent = g.progress + '%';
+      };
+      slider.onchange = () => { save(); render(); };
+
+      const logInput = li.querySelector('.log-input');
+      const addLog = () => {
+        const text = logInput.value.trim();
+        if (!text) return;
+        g.logs.push({ date: todayISO(), text });
+        save(); render();
+      };
+      li.querySelector('.log-btn').onclick = addLog;
+      logInput.addEventListener('keydown', e => { if (e.key === 'Enter') addLog(); });
+
+      li.querySelector('.del').onclick = () => { goals.splice(i, 1); save(); render(); };
+
+      listEl.appendChild(li);
+    });
+  }
+
+  document.getElementById('addBtn').onclick = () => {
+    const name = nameInput.value.trim();
+    if (!name) return;
+    goals.push({
+      name,
+      note: noteInput.value.trim(),
+      due: dateInput.value || null,
+      category: categorySelect.value,
+      progress: 0,
+      logs: []
+    });
+    nameInput.value = '';
+    noteInput.value = '';
+    dateInput.value = '';
+    save();
+    render();
+  };
+
+  document.querySelectorAll('#goalFilters button').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('#goalFilters button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.cat;
+      render();
+    };
+  });
+
+  render();          ← (آخر سطر كود في الصفحة، هيختلف من ملف للتاني)
+</script>
+<script src="shared.js"></script>
+</body>
+</html>

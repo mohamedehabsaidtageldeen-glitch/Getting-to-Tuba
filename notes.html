@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الملاحظات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F6F4EE;
+    --surface: #FFFFFF;
+    --ink: #22301F;
+    --ink-soft: #5C6B57;
+    --line: #DCE0D2;
+    --accent: #3F6B4A;
+    --accent-soft: #E4EDDE;
+    --pin: #B08A3E;
+    --danger: #B4543F;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Tajawal', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 28px 16px 60px;
+    min-height: 100vh;
+  }
+  .page { width: 100%; max-width: 520px; }
+  .top { margin-bottom: 16px; }
+  .top h1 { font-size: 26px; font-weight: 900; margin: 0 0 4px; }
+  .top .sub { font-size: 13px; color: var(--ink-soft); }
+
+  .search {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 14.5px;
+    margin-bottom: 16px;
+  }
+  .search:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .form {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .form input, .form textarea {
+    padding: 12px 13px;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 14.5px;
+    width: 100%;
+  }
+  .form textarea { resize: vertical; min-height: 70px; }
+  .form input:focus, .form textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .form button {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 9px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .section-label { font-size: 12.5px; color: var(--ink-soft); margin: 4px 0 8px; }
+
+  ul.notes { list-style: none; margin: 0 0 20px; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .note {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+  }
+  .note.pinned { border-color: var(--pin); background: #FBF6EA; }
+  .note .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .note .title { font-size: 15.5px; font-weight: 700; }
+  .note .body { font-size: 14.5px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+  .note .foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+  .note .date { font-size: 12px; color: var(--ink-soft); }
+  .note .actions { display: flex; gap: 6px; }
+  .note .actions button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+    color: var(--ink-soft);
+  }
+  .note .actions .pin-btn.active { color: var(--pin); }
+  .note .actions .del-btn:hover { color: var(--danger); }
+
+  .empty {
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 14px;
+    padding: 40px 10px;
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="top">
+    <h1>الملاحظات</h1>
+    <div class="sub">اكتب أي حاجة عايز تفتكرها</div>
+  </div>
+
+  <input class="search" id="searchInput" type="text" placeholder="دور في الملاحظات..." />
+
+  <div class="form">
+    <input id="titleInput" type="text" placeholder="عنوان الملاحظة (اختياري)" />
+    <textarea id="bodyInput" placeholder="اكتب ملاحظتك هنا..."></textarea>
+    <button id="addBtn">حفظ الملاحظة</button>
+  </div>
+
+  <div id="listArea"></div>
+  <div class="empty" id="emptyMsg" style="display:none;">لسه معملتش أي ملاحظات</div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'notes-data';
+
+  let notes = [];
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    notes = saved ? JSON.parse(saved) : [];
+  } catch (e) { notes = []; }
+
+  const listArea = document.getElementById('listArea');
+  const emptyEl = document.getElementById('emptyMsg');
+  const titleInput = document.getElementById('titleInput');
+  const bodyInput = document.getElementById('bodyInput');
+  const searchInput = document.getElementById('searchInput');
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(notes)); } catch (e) {}
+  }
+
+  function formatDate(ts) {
+    const d = new Date(ts);
+    const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+    return d.getDate() + ' ' + months[d.getMonth()];
+  }
+
+  function renderNoteEl(note, realIndex) {
+    const li = document.createElement('li');
+    li.className = 'note' + (note.pinned ? ' pinned' : '');
+    li.innerHTML = `
+      <div class="head">
+        <div class="title"></div>
+      </div>
+      <div class="body"></div>
+      <div class="foot">
+        <span class="date"></span>
+        <div class="actions">
+          <button class="pin-btn ${note.pinned ? 'active' : ''}" aria-label="تثبيت الملاحظة">📌</button>
+          <button class="del-btn" aria-label="حذف الملاحظة">✕</button>
+        </div>
+      </div>
+    `;
+    li.querySelector('.title').textContent = note.title || 'بدون عنوان';
+    li.querySelector('.body').textContent = note.body;
+    li.querySelector('.date').textContent = formatDate(note.createdAt);
+    li.querySelector('.pin-btn').onclick = () => {
+      notes[realIndex].pinned = !notes[realIndex].pinned;
+      save(); render();
+    };
+    li.querySelector('.del-btn').onclick = () => {
+      notes.splice(realIndex, 1);
+      save(); render();
+    };
+    return li;
+  }
+
+  function render() {
+    listArea.innerHTML = '';
+    const query = searchInput.value.trim().toLowerCase();
+
+    const filtered = notes
+      .map((n, i) => ({ n, i }))
+      .filter(({ n }) => !query || (n.title + ' ' + n.body).toLowerCase().includes(query));
+
+    if (filtered.length === 0) {
+      emptyEl.style.display = 'block';
+      return;
+    }
+    emptyEl.style.display = 'none';
+
+    const pinned = filtered.filter(({ n }) => n.pinned);
+    const rest = filtered.filter(({ n }) => !n.pinned).sort((a, b) => b.n.createdAt - a.n.createdAt);
+
+    if (pinned.length > 0) {
+      const label = document.createElement('div');
+      label.className = 'section-label';
+      label.textContent = 'مثبّتة';
+      listArea.appendChild(label);
+      const ul = document.createElement('ul');
+      ul.className = 'notes';
+      pinned.forEach(({ n, i }) => ul.appendChild(renderNoteEl(n, i)));
+      listArea.appendChild(ul);
+    }
+
+    if (rest.length > 0) {
+      if (pinned.length > 0) {
+        const label = document.createElement('div');
+        label.className = 'section-label';
+        label.textContent = 'كل الملاحظات';
+        listArea.appendChild(label);
+      }
+      const ul = document.createElement('ul');
+      ul.className = 'notes';
+      rest.forEach(({ n, i }) => ul.appendChild(renderNoteEl(n, i)));
+      listArea.appendChild(ul);
+    }
+  }
+
+  function addNote() {
+    const body = bodyInput.value.trim();
+    if (!body) return;
+    notes.push({
+      title: titleInput.value.trim(),
+      body: body,
+      pinned: false,
+      createdAt: Date.now()
+    });
+    titleInput.value = '';
+    bodyInput.value = '';
+    save();
+    render();
+  }
+
+  document.getElementById('addBtn').onclick = addNote;
+  searchInput.addEventListener('input', render);
+  render();
+</script>
+</body>
+
+</script>
+<script src="shared.js"></script>
+</body>
+</html>
+</html>

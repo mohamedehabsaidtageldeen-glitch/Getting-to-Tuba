@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>تنبيهات الصلاة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/adhan@4/dist/adhan.min.js"></script>
+<style>
+  :root {
+    --bg: #F6F4EE;
+    --surface: #FFFFFF;
+    --ink: #22301F;
+    --ink-soft: #5C6B57;
+    --line: #DCE0D2;
+    --accent: #3F6B4A;
+    --accent-soft: #E4EDDE;
+    --danger: #B4543F;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Tajawal', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 28px 16px 60px;
+    min-height: 100vh;
+  }
+  .page { width: 100%; max-width: 480px; }
+  .top { margin-bottom: 18px; }
+  .top h1 { font-size: 26px; font-weight: 900; margin: 0 0 4px; }
+  .top .sub { font-size: 13px; color: var(--ink-soft); }
+
+  .location {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .location .row { display: flex; gap: 8px; }
+  .location input {
+    flex: 1;
+    padding: 11px 12px;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 14px;
+  }
+  .location button, .reminder button {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 9px;
+    padding: 11px 14px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .location .note { font-size: 12px; color: var(--ink-soft); }
+
+  .next-card {
+    background: var(--accent);
+    color: var(--bg);
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+  .next-card .name { font-size: 20px; font-weight: 900; margin-bottom: 4px; }
+  .next-card .countdown { font-size: 14px; opacity: .9; }
+
+  ul.times { list-style: none; margin: 0 0 18px; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .time-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 13px 16px;
+  }
+  .time-row.active { border-color: var(--accent); background: var(--accent-soft); }
+  .time-row .name { font-size: 15px; font-weight: 700; }
+  .time-row .clock { font-size: 15px; color: var(--ink-soft); }
+  .time-row.active .clock { color: var(--accent); font-weight: 700; }
+
+  .reminder {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .reminder .row { display: flex; align-items: center; gap: 8px; }
+  .reminder select {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+    font-family: inherit;
+  }
+  .status { font-size: 12.5px; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="top">
+    <h1>تنبيهات الصلاة</h1>
+    <div class="sub" id="todayLabel"></div>
+  </div>
+
+  <div class="location">
+    <div class="row">
+      <button id="locBtn">استخدام موقعي الحالي</button>
+    </div>
+    <div class="row">
+      <input id="latInput" type="text" placeholder="خط العرض (lat)" />
+      <input id="lonInput" type="text" placeholder="خط الطول (lon)" />
+      <button id="saveLocBtn">حفظ</button>
+    </div>
+    <div class="note" id="locNote">الموقع الحالي: القاهرة (تقدر تغيّره فوق)</div>
+  </div>
+
+  <div class="next-card">
+    <div class="name" id="nextName">جاري الحساب...</div>
+    <div class="countdown" id="nextCountdown"></div>
+  </div>
+
+  <ul class="times" id="timesList"></ul>
+
+  <div class="reminder">
+    <div class="row">
+      <span>نبهني قبل الأذان بـ</span>
+      <select id="beforeSelect">
+        <option value="0">في وقت الأذان</option>
+        <option value="5">5 دقايق</option>
+        <option value="10">10 دقايق</option>
+        <option value="15">15 دقيقة</option>
+      </select>
+    </div>
+    <button id="notifBtn">تفعيل التنبيهات</button>
+    <div class="status" id="notifStatus">التنبيهات لسه مش مفعّلة</div>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'prayer-times-settings';
+  const PRAYERS = [
+    { key: 'fajr', label: 'الفجر' },
+    { key: 'sunrise', label: 'الشروق' },
+    { key: 'dhuhr', label: 'الظهر' },
+    { key: 'asr', label: 'العصر' },
+    { key: 'maghrib', label: 'المغرب' },
+    { key: 'isha', label: 'العشاء' }
+  ];
+
+  let settings = { lat: 30.0444, lon: 31.2357, before: 0, notified: {} };
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) settings = Object.assign(settings, JSON.parse(saved));
+  } catch (e) {}
+
+  const latInput = document.getElementById('latInput');
+  const lonInput = document.getElementById('lonInput');
+  const locNote = document.getElementById('locNote');
+  const beforeSelect = document.getElementById('beforeSelect');
+  const notifBtn = document.getElementById('notifBtn');
+  const notifStatus = document.getElementById('notifStatus');
+
+  latInput.value = settings.lat;
+  lonInput.value = settings.lon;
+  beforeSelect.value = String(settings.before || 0);
+
+  function saveSettings() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(settings)); } catch (e) {}
+  }
+
+  function formatTime(date) {
+    let h = date.getHours();
+    const m = date.getMinutes();
+    const period = h >= 12 ? 'م' : 'ص';
+    h = h % 12; if (h === 0) h = 12;
+    return h + ':' + String(m).padStart(2, '0') + ' ' + period;
+  }
+
+  const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const now0 = new Date();
+  document.getElementById('todayLabel').textContent =
+    days[now0.getDay()] + '، ' + now0.getDate() + ' ' + months[now0.getMonth()];
+
+  let times = null;
+
+  function computeTimes() {
+    const coords = new adhan.Coordinates(parseFloat(settings.lat), parseFloat(settings.lon));
+    const params = adhan.CalculationMethod.Egyptian();
+    const pt = new adhan.PrayerTimes(coords, new Date(), params);
+    times = {
+      fajr: pt.fajr, sunrise: pt.sunrise, dhuhr: pt.dhuhr,
+      asr: pt.asr, maghrib: pt.maghrib, isha: pt.isha
+    };
+  }
+
+  function render() {
+    if (!times) return;
+    const listEl = document.getElementById('timesList');
+    listEl.innerHTML = '';
+    const now = new Date();
+
+    let next = null;
+    for (const p of PRAYERS) {
+      if (p.key === 'sunrise') continue;
+      if (times[p.key] > now && (!next || times[p.key] < times[next.key])) next = p;
+    }
+    if (!next) next = PRAYERS[0];
+
+    PRAYERS.forEach(p => {
+      const row = document.createElement('li');
+      row.className = 'time-row' + (next && p.key === next.key ? ' active' : '');
+      row.innerHTML = `<span class="name">${p.label}</span><span class="clock">${formatTime(times[p.key])}</span>`;
+      listEl.appendChild(row);
+    });
+
+    document.getElementById('nextName').textContent = 'الصلاة الجاية: ' + next.label;
+    const diffMs = times[next.key] - now;
+    const mins = Math.max(0, Math.round(diffMs / 60000));
+    const h = Math.floor(mins / 60), m = mins % 60;
+    document.getElementById('nextCountdown').textContent =
+      h > 0 ? ('باقي ' + h + ' ساعة و' + m + ' دقيقة') : ('باقي ' + m + ' دقيقة');
+
+    checkNotify(next, diffMs);
+  }
+
+  function checkNotify(next, diffMs) {
+    if (Notification.permission !== 'granted') return;
+    const beforeMin = parseInt(beforeSelect.value, 10) || 0;
+    const key = next.key + '-' + new Date().toDateString();
+    const targetMs = beforeMin * 60000;
+    if (diffMs <= targetMs && diffMs > targetMs - 60000 && !settings.notified[key]) {
+      const msg = beforeMin === 0
+        ? ('حان الآن وقت صلاة ' + next.label)
+        : ('باقي ' + beforeMin + ' دقايق على أذان ' + next.label);
+      new Notification('تنبيه الصلاة', { body: msg });
+      settings.notified[key] = true;
+      saveSettings();
+    }
+  }
+
+  document.getElementById('saveLocBtn').onclick = () => {
+    const lat = parseFloat(latInput.value), lon = parseFloat(lonInput.value);
+    if (isNaN(lat) || isNaN(lon)) { locNote.textContent = 'اكتب أرقام صحيحة للموقع'; return; }
+    settings.lat = lat; settings.lon = lon;
+    saveSettings();
+    locNote.textContent = 'تم حفظ الموقع';
+    computeTimes(); render();
+  };
+
+  document.getElementById('locBtn').onclick = () => {
+    if (!navigator.geolocation) { locNote.textContent = 'المتصفح ده مش بيدعم تحديد الموقع'; return; }
+    locNote.textContent = 'جاري تحديد موقعك...';
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        settings.lat = pos.coords.latitude;
+        settings.lon = pos.coords.longitude;
+        latInput.value = settings.lat.toFixed(4);
+        lonInput.value = settings.lon.toFixed(4);
+        saveSettings();
+        locNote.textContent = 'تم تحديد موقعك الحالي';
+        computeTimes(); render();
+      },
+      () => { locNote.textContent = 'مقدرش أوصل لموقعك، اكتبه يدوي'; }
+    );
+  };
+
+  beforeSelect.onchange = () => {
+    settings.before = parseInt(beforeSelect.value, 10) || 0;
+    settings.notified = {};
+    saveSettings();
+  };
+
+  notifBtn.onclick = () => {
+    if (!('Notification' in window)) { notifStatus.textContent = 'المتصفح ده مش بيدعم التنبيهات'; return; }
+    Notification.requestPermission().then(perm => {
+      notifStatus.textContent = perm === 'granted'
+        ? 'التنبيهات شغالة، سيب الصفحة مفتوحة عشان توصلك'
+        : 'رفضت إذن التنبيهات من المتصفح';
+    });
+  };
+
+  computeTimes();
+  render();
+  setInterval(render, 20000);
+</script>
+</body>
+
+</script>
+<script src="shared.js"></script>
+</body>
+</html>
+</html>

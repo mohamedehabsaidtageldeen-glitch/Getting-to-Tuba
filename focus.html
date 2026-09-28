@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>مؤقت التركيز</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F6F4EE;
+    --surface: #FFFFFF;
+    --ink: #22301F;
+    --ink-soft: #5C6B57;
+    --line: #DCE0D2;
+    --accent: #3F6B4A;
+    --accent-soft: #E4EDDE;
+    --habit: #B08A3E;
+    --danger: #B4543F;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Tajawal', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 28px 16px 60px;
+    min-height: 100vh;
+  }
+  .page { width: 100%; max-width: 520px; }
+  .back { font-size: 13px; color: var(--ink-soft); text-decoration: none; display: inline-block; margin-bottom: 10px; }
+  .top { margin-bottom: 16px; }
+  .top h1 { font-size: 26px; font-weight: 900; margin: 0 0 4px; }
+  .top .sub { font-size: 13px; color: var(--ink-soft); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .label { font-size: 12.5px; color: var(--ink-soft); margin-bottom: 8px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .chips button {
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink-soft);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .chips button.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
+  .chips button:disabled { opacity: .5; cursor: not-allowed; }
+
+  .timer { text-align: center; margin: 8px 0 14px; }
+  .time {
+    font-size: 68px;
+    font-weight: 900;
+    direction: ltr;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .running-label { font-size: 13px; color: var(--accent); min-height: 20px; margin-top: 4px; }
+  .progress { height: 8px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); overflow: hidden; margin: 12px 0 16px; }
+  .progress .fill { height: 100%; background: var(--accent); width: 0%; transition: width .5s linear; }
+
+  .btn {
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn.start { background: var(--accent); color: var(--bg); }
+  .btn.stop { background: var(--surface); color: var(--danger); border: 2px solid var(--danger); }
+
+  .manual { display: flex; gap: 8px; margin-top: 14px; }
+  .manual input {
+    flex: 1;
+    padding: 11px 12px;
+    border-radius: 9px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 14px;
+  }
+  .manual button {
+    background: var(--ink);
+    color: var(--bg);
+    border: none;
+    border-radius: 9px;
+    padding: 0 16px;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .today-total { font-size: 30px; font-weight: 900; }
+  .today-sub { font-size: 13px; color: var(--ink-soft); margin-bottom: 10px; }
+  .target-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-soft); margin: 10px 0; }
+  .target-row input {
+    width: 76px;
+    padding: 7px 9px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 13px;
+  }
+  .breakdown { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .breakdown span {
+    font-size: 12.5px;
+    font-weight: 700;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 5px 11px;
+    border-radius: 999px;
+  }
+
+  .chart { display: flex; gap: 6px; align-items: flex-end; height: 150px; margin-top: 10px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; }
+  .bar-val { font-size: 10.5px; color: var(--ink-soft); min-height: 14px; }
+  .bar-track { flex: 1; width: 100%; display: flex; align-items: flex-end; }
+  .bar-fill { width: 100%; background: var(--line); border-radius: 6px 6px 0 0; min-height: 2px; }
+  .bar-fill.today { background: var(--accent); }
+  .bar-lbl { font-size: 11px; color: var(--ink-soft); margin-top: 5px; }
+  .week-total { font-size: 13px; color: var(--ink-soft); margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <a class="back" href="index.html">← الصفحة الرئيسية</a>
+  <div class="top">
+    <h1>مؤقت التركيز</h1>
+    <div class="sub">اشتغل بتركيز، والوقت بيتسجل لوحده</div>
+  </div>
+
+  <div class="card">
+    <div class="label">هتركز على إيه؟</div>
+    <div class="chips" id="catChips"></div>
+    <div class="label">المدة (بالدقايق)</div>
+    <div class="chips" id="durChips"></div>
+
+    <div class="timer">
+      <div class="time" id="time">25:00</div>
+      <div class="running-label" id="runningLabel"></div>
+    </div>
+    <div class="progress"><div class="fill" id="fill"></div></div>
+
+    <button class="btn start" id="startBtn">ابدأ التركيز</button>
+    <button class="btn stop" id="stopBtn" style="display:none;">إنهاء وتسجيل الوقت</button>
+
+    <div class="manual">
+      <input id="manualMin" type="number" min="1" max="600" placeholder="سجّل وقت اشتغلته من غير المؤقت (دقايق)" />
+      <button id="manualBtn">سجّل</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label">النهارده</div>
+    <div class="today-total" id="todayTotal">0د</div>
+    <div class="today-sub" id="todaySub"></div>
+    <div class="progress"><div class="fill" id="targetFill"></div></div>
+    <div class="target-row">
+      <span>هدفي اليومي:</span>
+      <input id="targetInput" type="number" min="10" max="900" step="10" />
+      <span>دقيقة</span>
+    </div>
+    <div class="breakdown" id="breakdown"></div>
+  </div>
+
+  <div class="card">
+    <div class="label">آخر 7 أيام</div>
+    <div class="chart" id="chart"></div>
+    <div class="week-total" id="weekTotal"></div>
+  </div>
+</div>
+
+<script>
+  const FOCUS_KEY = 'focus-log';
+  const ACTIVE_KEY = 'focus-active';
+  const TARGET_KEY = 'focus-target';
+  const CATS = ['دراسة', 'لغة', 'تصميم', 'برمجة'];
+  const DURS = [25, 45, 60, 90];
+  const SHORT_DAYS = ['أحد','إثن','ثلا','أرب','خمي','جمع','سبت'];
+
+  function read(k, f) { try { const s = localStorage.getItem(k); return s ? JSON.parse(s) : f; } catch (e) { return f; } }
+  function write(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+
+  let log = read(FOCUS_KEY, {});
+  let active = read(ACTIVE_KEY, null);
+  let target = read(TARGET_KEY, 180);
+  let category = active ? active.cat : 'دراسة';
+  let duration = active ? active.minutes : 25;
+  let tick = null;
+
+  const timeEl = document.getElementById('time');
+  const fillEl = document.getElementById('fill');
+  const runningLabel = document.getElementById('runningLabel');
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const targetInput = document.getElementById('targetInput');
+  targetInput.value = target;
+
+  function iso(d) {
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function fmtMin(m) {
+    const h = Math.floor(m / 60), r = m % 60;
+    if (h > 0) return h + 'س' + (r ? ' ' + r + 'د' : '');
+    return r + 'د';
+  }
+
+  function addMinutes(cat, mins) {
+    const k = iso(new Date());
+    log[k] = log[k] || {};
+    log[k][cat] = (log[k][cat] || 0) + mins;
+    write(FOCUS_KEY, log);
+  }
+
+  function dayTotal(k) {
+    return Object.values(log[k] || {}).reduce((a, b) => a + b, 0);
+  }
+
+  function renderChips() {
+    const locked = !!active;
+    const catEl = document.getElementById('catChips');
+    catEl.innerHTML = '';
+    CATS.forEach(c => {
+      const b = document.createElement('button');
+      b.textContent = c;
+      b.disabled = locked;
+      if (c === category) b.classList.add('active');
+      b.onclick = () => { category = c; renderChips(); };
+      catEl.appendChild(b);
+    });
+    const durEl = document.getElementById('durChips');
+    durEl.innerHTML = '';
+    DURS.forEach(d => {
+      const b = document.createElement('button');
+      b.textContent = d;
+      b.disabled = locked;
+      if (d === duration) b.classList.add('active');
+      b.onclick = () => { duration = d; renderChips(); updateDisplay(); };
+      durEl.appendChild(b);
+    });
+  }
+
+  function updateDisplay() {
+    let remMs, totalMs;
+    if (active) {
+      totalMs = active.minutes * 60000;
+      remMs = Math.max(0, active.end - Date.now());
+    } else {
+      totalMs = duration * 60000;
+      remMs = totalMs;
+    }
+    const totalSec = Math.ceil(remMs / 1000);
+    const mm = String(Math.floor(totalSec / 60)).padStart(2, '0');
+    const ss = String(totalSec % 60).padStart(2, '0');
+    timeEl.textContent = mm + ':' + ss;
+    fillEl.style.width = active ? (((totalMs - remMs) / totalMs) * 100) + '%' : '0%';
+    document.title = active ? (mm + ':' + ss + ' • تركيز') : 'مؤقت التركيز';
+    runningLabel.textContent = active ? ('شغّال على: ' + active.cat) : '';
+    startBtn.style.display = active ? 'none' : 'block';
+    stopBtn.style.display = active ? 'block' : 'none';
+    if (active && remMs <= 0) finish(true, false);
+  }
+
+  function beep() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = 880; g.gain.value = 0.2;
+      o.start();
+      setTimeout(() => { o.stop(); ctx.close(); }, 700);
+    } catch (e) {}
+  }
+
+  function startTimer() {
+    if ('Notification' in window && Notification.permission === 'default') {
+      try { Notification.requestPermission(); } catch (e) {}
+    }
+    const now = Date.now();
+    active = { start: now, end: now + duration * 60000, minutes: duration, cat: category };
+    write(ACTIVE_KEY, active);
+    renderChips();
+    clearInterval(tick);
+    tick = setInterval(updateDisplay, 500);
+    updateDisplay();
+  }
+
+  function finish(completed, silent) {
+    if (!active) return;
+    const mins = completed ? active.minutes : Math.floor((Date.now() - active.start) / 60000);
+    const cat = active.cat;
+    if (mins > 0) addMinutes(cat, mins);
+    active = null;
+    write(ACTIVE_KEY, null);
+    clearInterval(tick);
+    if (completed && !silent) {
+      beep();
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try { new Notification('خلص وقت التركيز 🎯', { body: 'سجّلنا ' + mins + ' دقيقة في ' + cat }); } catch (e) {}
+      }
+    }
+    renderChips();
+    updateDisplay();
+    renderStats();
+  }
+
+  function renderStats() {
+    const todayKey = iso(new Date());
+    const today = dayTotal(todayKey);
+    document.getElementById('todayTotal').textContent = fmtMin(today);
+    document.getElementById('todaySub').textContent =
+      today >= target ? 'وصلت لهدفك النهارده 🎯' : 'باقي ' + fmtMin(target - today) + ' على هدفك';
+    document.getElementById('targetFill').style.width = Math.min(100, (today / target) * 100) + '%';
+
+    const bd = document.getElementById('breakdown');
+    bd.innerHTML = '';
+    const todayLog = log[todayKey] || {};
+    CATS.forEach(c => {
+      if (todayLog[c]) {
+        const s = document.createElement('span');
+        s.textContent = c + ': ' + fmtMin(todayLog[c]);
+        bd.appendChild(s);
+      }
+    });
+
+    const bars = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      bars.push({ label: SHORT_DAYS[d.getDay()], total: dayTotal(iso(d)), isToday: i === 0 });
+    }
+    const max = Math.max(60, ...bars.map(b => b.total));
+    const chart = document.getElementById('chart');
+    chart.innerHTML = '';
+    bars.forEach(b => {
+      const col = document.createElement('div');
+      col.className = 'bar-col';
+      col.innerHTML =
+        '<div class="bar-val">' + (b.total ? fmtMin(b.total) : '') + '</div>' +
+        '<div class="bar-track"><div class="bar-fill' + (b.isToday ? ' today' : '') +
+        '" style="height:' + (b.total / max * 100) + '%"></div></div>' +
+        '<div class="bar-lbl">' + b.label + '</div>';
+      chart.appendChild(col);
+    });
+    const week = bars.reduce((a, b) => a + b.total, 0);
+    document.getElementById('weekTotal').textContent = 'إجمالي آخر 7 أيام: ' + fmtMin(week);
+  }
+
+  startBtn.onclick = startTimer;
+  stopBtn.onclick = () => finish(false, true);
+
+  document.getElementById('manualBtn').onclick = () => {
+    const input = document.getElementById('manualMin');
+    const m = parseInt(input.value, 10);
+    if (!m || m < 1 || m > 600) return;
+    addMinutes(category, m);
+    input.value = '';
+    renderStats();
+  };
+
+  targetInput.onchange = () => {
+    const v = parseInt(targetInput.value, 10);
+    if (!v || v < 10) { targetInput.value = target; return; }
+    target = v;
+    write(TARGET_KEY, target);
+    renderStats();
+  };
+
+  renderChips();
+  if (active) {
+    if (active.end <= Date.now()) finish(true, true);
+    else { tick = setInterval(updateDisplay, 500); }
+  }
+  updateDisplay();
+  renderStats();
+</script>
+</body>
+
+</script>
+<script src="shared.js"></script>
+</body>
+</html>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>المذاكرة</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#F6F4EE;--surface:#FFFFFF;--ink:#22301F;--ink-soft:#5C6B57;--line:#DCE0D2;--accent:#3F6B4A;--accent-soft:#E4EDDE;--warn:#B08A3E;--danger:#B4543F}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Tajawal',sans-serif;display:flex;justify-content:center;padding:28px 16px 90px;min-height:100vh}
+  .page{width:100%;max-width:520px}
+  h1{font-size:26px;font-weight:900;margin:0 0 4px}
+  .sub{font-size:13px;color:var(--ink-soft);margin-bottom:14px}
+  .tabs{display:flex;gap:6px;margin-bottom:16px}
+  .tabs button{flex:1;padding:10px 4px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
+  .tabs button.on{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+  section{display:none}section.on{display:block}
+  .box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+  .box h3{margin:0 0 10px;font-size:14.5px}
+  input,select,textarea{width:100%;padding:11px 12px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-family:inherit;font-size:14px;margin-bottom:8px}
+  textarea{resize:vertical;min-height:54px}
+  .row{display:flex;gap:8px}.row>*{flex:1}
+  button{font-family:inherit;cursor:pointer}
+  .main{width:100%;padding:11px;border:none;border-radius:10px;background:var(--accent);color:var(--bg);font-size:14.5px;font-weight:700}
+  .ghost{padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink-soft);font-size:12.5px;font-weight:700}
+  .del{background:none;border:none;color:var(--ink-soft);font-size:16px;padding:4px}.del:hover{color:var(--danger)}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+  .stats div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 4px;text-align:center}
+  .stats b{display:block;font-size:20px;color:var(--accent)}.stats small{font-size:11.5px;color:var(--ink-soft)}
+  .exam{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .exam:last-child{border-bottom:none}
+  .exam small{display:block;color:var(--ink-soft);font-size:12px}
+  .cd{font-weight:900;font-size:15px;color:var(--accent);white-space:nowrap;text-align:left}
+  .cd.soon{color:var(--warn)}.cd.hot{color:var(--danger)}.cd.past{color:var(--ink-soft);font-weight:400}
+  .day{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;background:var(--bg)}
+  .day.today{border-color:var(--accent);background:var(--accent-soft)}
+  .day h4{margin:0 0 6px;font-size:13.5px;display:flex;justify-content:space-between}
+  .pi{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:14px}
+  .pi .ck{width:20px;height:20px;flex:none;border-radius:50%;border:2px solid var(--accent);background:transparent;padding:0;color:#fff;font-size:11px;line-height:1}
+  .pi.done .ck{background:var(--accent)}.pi.done .tx{color:var(--ink-soft);text-decoration:line-through}
+  .pi .tx{flex:1;word-break:break-word}
+  .pi .tg{font-size:11px;font-weight:700;background:var(--accent-soft);color:var(--accent);padding:2px 8px;border-radius:999px}
+  .addp{display:flex;gap:6px;margin-top:6px}.addp input{margin:0;flex:1;padding:8px 10px;font-size:13px}.addp select{margin:0;width:90px;padding:8px 4px;font-size:12.5px}
+  .addp button{background:var(--ink);color:var(--bg);border:none;border-radius:9px;padding:0 12px;font-size:13px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .chips button{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);font-size:12.5px;font-weight:700}
+  .chips button.on{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+  .err{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px;margin-bottom:10px}
+  .err.fixed{opacity:.65;border-color:var(--accent)}
+  .eh{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+  .eq{font-size:14.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+  .ea{font-size:13.5px;line-height:1.6;white-space:pre-wrap;background:var(--accent-soft);border-radius:8px;padding:8px 10px;margin-top:8px;word-break:break-word}
+  .es{font-size:12px;color:var(--ink-soft);margin-top:6px}
+  .tag{font-size:11px;font-weight:700;background:var(--accent-soft);color:var(--accent);padding:3px 9px;border-radius:999px}
+  .review{background:var(--accent);color:#fff;border-radius:16px;padding:16px;margin-bottom:14px}
+  .review .eq{font-size:16px;margin:8px 0}
+  .review .ea{background:rgba(255,255,255,.18);color:#fff}
+  .review .btns{display:flex;gap:8px;margin-top:12px}
+  .review .btns button{flex:1;padding:11px;border:none;border-radius:10px;font-size:14px;font-weight:700}
+  .b-show{background:#fff;color:var(--accent)}.b-ok{background:#fff;color:var(--accent)}.b-no{background:rgba(255,255,255,.25);color:#fff}
+  .empty{text-align:center;color:var(--ink-soft);font-size:13.5px;padding:24px 10px;border:1px dashed var(--line);border-radius:12px}
+  .srow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+  .srow:last-child{border-bottom:none}.srow small{color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>المذاكرة 📚</h1>
+  <div class="sub">الامتحانات، الخطة الأسبوعية، ودفتر الأخطاء في مكان واحد</div>
+
+  <div class="tabs" id="tabs">
+    <button data-t="home" class="on">نظرة عامة</button>
+    <button data-t="errors">دفتر الأخطاء</button>
+    <button data-t="subjects">المواد</button>
+  </div>
+
+  <!-- ===== نظرة عامة ===== -->
+  <section id="tab-home" class="on">
+    <div class="stats">
+      <div><b id="stMin">0د</b><small>مذاكرة النهارده</small></div>
+      <div><b id="stErr">0</b><small>أخطاء لسه محتاجة مراجعة</small></div>
+      <div><b id="stNext">-</b><small>أقرب امتحان</small></div>
+    </div>
+
+    <div class="box">
+      <h3>⏳ عد تنازلي للامتحانات</h3>
+      <div id="examList"></div>
+      <div style="margin-top:10px">
+        <select id="exSub"></select>
+        <div class="row"><input id="exTitle" placeholder="اسم الامتحان (اختياري)"><input id="exDate" type="date"></div>
+        <button class="main" id="exAdd">إضافة امتحان</button>
+      </div>
+    </div>
+
+    <div class="box">
+      <h3>🗓️ خطتي الأسبوعية (بتتكرر كل أسبوع)</h3>
+      <div id="planBox"></div>
+    </div>
+  </section>
+
+  <!-- ===== دفتر الأخطاء ===== -->
+  <section id="tab-errors">
+    <div id="reviewBox"></div>
+
+    <div class="box">
+      <h3>➕ سجّل غلطة</h3>
+      <select id="erSub"></select>
+      <textarea id="erQ" placeholder="السؤال أو الغلطة اللي غلطت فيها..."></textarea>
+      <textarea id="erA" placeholder="الإجابة الصح + ليه غلطت (عشان متكررهاش)..."></textarea>
+      <button class="main" id="erAdd">حفظ في الدفتر</button>
+    </div>
+
+    <div class="chips" id="erFilter"></div>
+    <button class="main" id="revBtn" style="margin-bottom:14px;background:var(--ink)">🎯 ابدأ مراجعة عشوائية</button>
+    <div id="errList"></div>
+  </section>
+
+  <!-- ===== المواد ===== -->
+  <section id="tab-subjects">
+    <div class="box">
+      <h3>📖 موادي</h3>
+      <div id="subList"></div>
+      <div style="margin-top:10px">
+        <input id="subIn" placeholder="اسم مادة جديدة...">
+        <button class="main" id="subAdd">إضافة مادة</button>
+        <button class="ghost" id="subDef" style="width:100%;margin-top:8px">ضيف المواد الأساسية (عربي، إنجليزي، رياضيات...)</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="shared.js"></script>
+<script>
+  const KEY='study-data';
+  const $=id=>document.getElementById(id);
+  const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  const MO=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const DN=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  const ORDER=[6,0,1,2,3,4,5]; // الأسبوع يبدأ من السبت
+  const todayISO=iso(new Date()),todayDow=new Date().getDay();
+
+  let S={subjects:[],exams:[],errors:[],plan:{}};
+  try{const v=JSON.parse(localStorage.getItem(KEY));if(v)S=Object.assign(S,v)}catch(e){}
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+  const sname=id=>{const s=S.subjects.find(x=>x.id===id);return s?s.name:'عام'};
+
+  let tab='home',filter='all',reviewing=null,revShown=false;
+
+  /* ---------- Tabs ---------- */
+  document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{
+    tab=b.dataset.t;
+    document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));
+    document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id==='tab-'+tab));
+  });
+
+  /* ---------- Subject selects ---------- */
+  function subOptions(withGeneral){
+    return (withGeneral?'<option value="">عام</option>':'')+S.subjects.map(s=>'<option value="'+s.id+'">'+esc(s.name)+'</option>').join('');
+  }
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  /* ---------- Overview ---------- */
+  function daysTo(d){const t=new Date();t.setHours(0,0,0,0);return Math.round((new Date(d+'T00:00:00')-t)/864e5)}
+  function fmtD(d){const x=new Date(d+'T00:00:00');return x.getDate()+' '+MO[x.getMonth()]}
+  function fmtM(m){return m>=60?Math.floor(m/60)+'س'+(m%60?' '+m%60+'د':''):m+'د'}
+
+  function renderStats(){
+    let fl={};try{fl=JSON.parse(localStorage.getItem('focus-log'))||{}}catch(e){}
+    $('stMin').textContent=fmtM((fl[todayISO]||{})['دراسة']||0);
+    $('stErr').textContent=S.errors.filter(e=>!e.fixed).length;
+    const up=S.exams.filter(e=>daysTo(e.date)>=0).sort((a,b)=>a.date<b.date?-1:1)[0];
+    $('stNext').textContent=up?(daysTo(up.date)===0?'النهارده':daysTo(up.date)+' يوم'):'-';
+  }
+
+  function renderExams(){
+    $('exSub').innerHTML=subOptions(true);
+    const box=$('examList');box.innerHTML='';
+    if(!S.exams.length){box.innerHTML='<div class="empty">مفيش امتحانات. ضيف أول امتحان تحت.</div>';return}
+    S.exams.slice().sort((a,b)=>a.date<b.date?-1:1).forEach(e=>{
+      const d=daysTo(e.date);
+      const r=document.createElement('div');r.className='exam';
+      r.innerHTML='<div><b></b><small></small></div><div style="display:flex;align-items:center;gap:6px"><span class="cd"></span><button class="del">✕</button></div>';
+      r.querySelector('b').textContent=(e.subject?sname(e.subject):'امتحان')+(e.title?' — '+e.title:'');
+      r.querySelector('small').textContent=fmtD(e.date);
+      const cd=r.querySelector('.cd');
+      cd.textContent=d<0?'عدّى':d===0?'النهارده!':d+' يوم';
+      cd.className='cd '+(d<0?'past':d<=3?'hot':d<=14?'soon':'');
+      r.querySelector('.del').onclick=()=>{S.exams=S.exams.filter(x=>x.id!==e.id);save();renderAll()};
+      box.appendChild(r);
+    });
+  }
+  $('exAdd').onclick=()=>{
+    const date=$('exDate').value;if(!date)return;
+    S.exams.push({id:uid(),subject:$('exSub').value,title:$('exTitle').value.trim(),date});
+    $('exTitle').value='';$('exDate').value='';save();renderAll();
+  };
+
+  /* ---------- Weekly plan ---------- */
+  function renderPlan(){
+    const box=$('planBox');box.innerHTML='';
+    ORDER.forEach(dow=>{
+      const items=S.plan[dow]||[];
+      const isT=dow===todayDow;
+      const day=document.createElement('div');day.className='day'+(isT?' today':'');
+      day.innerHTML='<h4><span>'+DN[dow]+(isT?' (النهارده)':'')+'</span><span style="font-weight:400;color:var(--ink-soft);font-size:12px">'+
+        (isT&&items.length?items.filter(i=>i.doneOn===todayISO).length+'/'+items.length:'')+'</span></h4><div class="items"></div>'+
+        '<div class="addp"><input placeholder="مثلاً: حل تمارين الوحدة 3"><select>'+subOptions(true)+'</select><button>+</button></div>';
+      const list=day.querySelector('.items');
+      items.forEach(it=>{
+        const done=isT&&it.doneOn===todayISO;
+        const r=document.createElement('div');r.className='pi'+(done?' done':'');
+        r.innerHTML=(isT?'<button class="ck">'+(done?'✓':'')+'</button>':'<span>•</span>')+'<span class="tx"></span><span class="tg"></span><button class="del">✕</button>';
+        r.querySelector('.tx').textContent=it.text;
+        r.querySelector('.tg').textContent=it.sid?sname(it.sid):'';
+        if(!it.sid)r.querySelector('.tg').style.display='none';
+        const ck=r.querySelector('.ck');
+        if(ck)ck.onclick=()=>{it.doneOn=done?null:todayISO;save();renderPlan()};
+        r.querySelector('.del').onclick=()=>{S.plan[dow]=S.plan[dow].filter(x=>x.id!==it.id);save();renderPlan()};
+        list.appendChild(r);
+      });
+      const inp=day.querySelector('.addp input'),sel=day.querySelector('.addp select');
+      const add=()=>{const t=inp.value.trim();if(!t)return;(S.plan[dow]=S.plan[dow]||[]).push({id:uid(),text:t,sid:sel.value,doneOn:null});save();renderPlan()};
+      day.querySelector('.addp button').onclick=add;
+      inp.addEventListener('keydown',e=>{if(e.key==='Enter')add()});
+      box.appendChild(day);
+    });
+  }
+
+  /* ---------- Error notebook ---------- */
+  function renderFilter(){
+    const f=$('erFilter');f.innerHTML='';
+    const opts=[['all','الكل'],['open','لسه محتاجة مراجعة']].concat(S.subjects.map(s=>[s.id,s.name]));
+    opts.forEach(([k,l])=>{
+      const b=document.createElement('button');b.textContent=l;if(k===filter)b.className='on';
+      b.onclick=()=>{filter=k;renderErrors();renderFilter()};f.appendChild(b);
+    });
+  }
+  function renderErrors(){
+    $('erSub').innerHTML=subOptions(true);
+    const box=$('errList');box.innerHTML='';
+    let list=S.errors.slice().sort((a,b)=>b.createdAt-a.createdAt);
+    if(filter==='open')list=list.filter(e=>!e.fixed);
+    else if(filter!=='all')list=list.filter(e=>e.sid===filter);
+    if(!list.length){box.innerHTML='<div class="empty">'+(S.errors.length?'مفيش أخطاء في الفلتر ده':'دفتر الأخطاء فاضي. كل ما تغلط في سؤال، سجّله هنا وراجعه.')+'</div>';return}
+    list.forEach(e=>{
+      const d=document.createElement('div');d.className='err'+(e.fixed?' fixed':'');
+      d.innerHTML='<div class="eh"><span class="tag"></span><button class="del">✕</button></div><div class="eq"></div><div class="ea"></div><div class="es"></div>';
+      d.querySelector('.tag').textContent=e.sid?sname(e.sid):'عام';
+      d.querySelector('.eq').textContent=e.q;
+      const a=d.querySelector('.ea');if(e.a)a.textContent=e.a;else a.style.display='none';
+      d.querySelector('.es').textContent=e.fixed?'✅ اتثبتت (3 مرات صح ورا بعض)':'إجابات صح ورا بعض: '+(e.streak||0)+' من 3';
+      d.querySelector('.del').onclick=()=>{S.errors=S.errors.filter(x=>x.id!==e.id);save();renderAll()};
+      box.appendChild(d);
+    });
+  }
+  $('erAdd').onclick=()=>{
+    const q=$('erQ').value.trim();if(!q)return;
+    S.errors.push({id:uid(),sid:$('erSub').value,q,a:$('erA').value.trim(),streak:0,fixed:false,createdAt:Date.now()});
+    $('erQ').value='';$('erA').value='';save();renderAll();
+  };
+
+  /* ---------- Review mode ---------- */
+  function renderReview(){
+    const box=$('reviewBox');box.innerHTML='';
+    if(!reviewing)return;
+    const e=S.errors.find(x=>x.id===reviewing);
+    if(!e){reviewing=null;return}
+    const d=document.createElement('div');d.className='review';
+    d.innerHTML='<small style="opacity:.85"></small><div class="eq"></div><div class="ea" style="display:none"></div><div class="btns"></div>';
+    d.querySelector('small').textContent='مراجعة • '+(e.sid?sname(e.sid):'عام');
+    d.querySelector('.eq').textContent=e.q;
+    const ans=d.querySelector('.ea'),btns=d.querySelector('.btns');
+    if(!revShown){
+      const b=document.createElement('button');b.className='b-show';b.textContent='حاول تفتكر، وبعدين أظهر الإجابة';
+      b.onclick=()=>{revShown=true;renderReview()};btns.appendChild(b);
+    }else{
+      ans.style.display='block';ans.textContent=e.a||'(مفيش إجابة متسجلة)';
+      const ok=document.createElement('button');ok.className='b-ok';ok.textContent='عرفتها ✓';
+      const no=document.createElement('button');no.className='b-no';no.textContent='لسه غلط ✗';
+      ok.onclick=()=>{e.streak=(e.streak||0)+1;if(e.streak>=3)e.fixed=true;next()};
+      no.onclick=()=>{e.streak=0;e.fixed=false;next()};
+      btns.appendChild(ok);btns.appendChild(no);
+    }
+    box.appendChild(d);
+  }
+  function next(){save();startReview(true)}
+  function startReview(again){
+    const pool=S.errors.filter(e=>!e.fixed&&(filter==='all'||filter==='open'||e.sid===filter));
+    if(!pool.length){reviewing=null;$('reviewBox').innerHTML='<div class="box" style="text-align:center">'+(again?'خلصت المراجعة، شغل عظيم 🌿':'مفيش أخطاء تحتاج مراجعة دلوقتي 🌿')+'</div>';renderAll(true);return}
+    reviewing=pool[Math.floor(Math.random()*pool.length)].id;revShown=false;
+    renderAll(true);
+  }
+  $('revBtn').onclick=()=>startReview(false);
+
+  /* ---------- Subjects ---------- */
+  function renderSubjects(){
+    const box=$('subList');box.innerHTML='';
+    if(!S.subjects.length){box.innerHTML='<div class="empty">لسه مفيش مواد. ضيف مادة أو دوس على الزرار اللي تحت.</div>';return}
+    S.subjects.forEach(s=>{
+      const n=S.errors.filter(e=>e.sid===s.id&&!e.fixed).length;
+      const r=document.createElement('div');r.className='srow';
+      r.innerHTML='<div><b></b><br><small></small></div><button class="del">✕</button>';
+      r.querySelector('b').textContent=s.name;
+      r.querySelector('small').textContent=n+' غلطة محتاجة مراجعة';
+      r.querySelector('.del').onclick=()=>{
+        if(!confirm('لو مسحت المادة هتتمسح أخطائها وامتحاناتها وخطتها كمان. متأكد؟'))return;
+        S.subjects=S.subjects.filter(x=>x.id!==s.id);
+        S.errors=S.errors.filter(e=>e.sid!==s.id);
+        S.exams=S.exams.filter(e=>e.subject!==s.id);
+        Object.keys(S.plan).forEach(k=>S.plan[k]=S.plan[k].filter(i=>i.sid!==s.id));
+        if(filter===s.id)filter='all';
+        save();renderAll();
+      };
+      box.appendChild(r);
+    });
+  }
+  $('subAdd').onclick=()=>{
+    const n=$('subIn').value.trim();if(!n)return;
+    if(S.subjects.some(s=>s.name===n))return;
+    S.subjects.push({id:uid(),name:n});$('subIn').value='';save();renderAll();
+  };
+  $('subIn').addEventListener('keydown',e=>{if(e.key==='Enter')$('subAdd').click()});
+  $('subDef').onclick=()=>{
+    ['لغة عربية','لغة إنجليزية','رياضيات','علوم','دراسات','تربية دينية'].forEach(n=>{
+      if(!S.subjects.some(s=>s.name===n))S.subjects.push({id:uid(),name:n});
+    });
+    save();renderAll();
+  };
+
+  /* ---------- Render all ---------- */
+  function renderAll(keepReview){
+    renderStats();renderExams();renderPlan();renderFilter();renderErrors();renderSubjects();
+    if(keepReview)renderReview();
+    else if(!reviewing)$('reviewBox').innerHTML='';
+  }
+  renderAll();
+</script>
+</body>
+</html>

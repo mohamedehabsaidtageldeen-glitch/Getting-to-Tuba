@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الخطط</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#F6F4EE;--surface:#FFF;--ink:#22301F;--ink-soft:#5C6B57;--line:#DCE0D2;--accent:#3F6B4A;--accent-soft:#E4EDDE;--danger:#B4543F;--gold:#B08A3E}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Tajawal',sans-serif;display:flex;justify-content:center;padding:28px 16px 90px;min-height:100vh}
+  .page{width:100%;max-width:520px}
+  h1{font-size:26px;font-weight:900;margin:0 0 4px}.sub{font-size:13px;color:var(--ink-soft);margin-bottom:16px}
+  h2{font-size:15px;margin:22px 0 10px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+  input,select{width:100%;padding:12px 13px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-family:inherit;font-size:14.5px;margin-bottom:8px}
+  button{font-family:inherit;cursor:pointer}
+  .main{width:100%;padding:12px;border:none;border-radius:10px;background:var(--accent);color:var(--bg);font-size:15px;font-weight:700}
+  .ghost{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink-soft);font-size:13px;font-weight:700}
+  .tg{display:flex;gap:8px;margin-bottom:12px}
+  .tg button{flex:1;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink-soft);font-weight:700;font-size:14px}
+  .tg button.on{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+  .banner{background:#F3EBD8;color:#6d5720;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.7;margin-bottom:14px}
+  .plan{position:relative}
+  .plan.best{border:2px solid var(--accent)}
+  .tag{position:absolute;top:-10px;right:14px;background:var(--accent);color:var(--bg);font-size:11.5px;font-weight:700;padding:3px 12px;border-radius:999px}
+  .pn{font-size:18px;font-weight:900}
+  .price{font-size:30px;font-weight:900;margin:6px 0}.price small{font-size:13px;color:var(--ink-soft);font-weight:400}
+  .plan ul{list-style:none;padding:0;margin:10px 0 14px}
+  .plan li{font-size:14px;padding:5px 0}.plan li:before{content:'✓ ';color:var(--accent);font-weight:900}
+  .plan li.no{color:var(--ink-soft);text-decoration:line-through}.plan li.no:before{content:'✕ ';color:var(--ink-soft)}
+  .pay{background:var(--bg);border:1px dashed var(--accent);border-radius:12px;padding:14px;margin-top:10px;font-size:14px;line-height:1.8}
+  .copy{background:var(--ink);color:var(--bg);border:none;border-radius:8px;padding:5px 12px;font-size:12.5px;margin-right:6px}
+  .ord{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .ord:last-child{border:none}.ord small{color:var(--ink-soft);display:block;margin-top:2px}
+  .note{font-size:12.5px;color:var(--ink-soft);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>الخطط 💎</h1>
+  <div class="sub">اختار الخطة اللي تناسبك</div>
+
+  <div class="banner">
+    ⚠️ الاشتراكات المدفوعة لسه في مرحلة التجربة. حاليًا كل مميزات البرنامج متاحة مجانًا، والطلب بيتبعت لصاحب البرنامج على واتساب ويراجعه بنفسه. مفيش حاجة بتتفعل تلقائيًا من الصفحة دي.
+  </div>
+
+  <div class="card">
+    <div class="note" style="margin-bottom:8px">اسمك (بيتكتب في رسالة الطلب بس)</div>
+    <input id="nm" placeholder="الاسم" maxlength="40">
+  </div>
+
+  <h2>الخطط</h2>
+  <div class="tg" id="cycle"><button data-c="m" class="on">شهري</button><button data-c="y">سنوي (وفّر شهرين)</button></div>
+  <div id="plans"></div>
+  <div id="checkout"></div>
+
+  <h2>طلباتي</h2>
+  <div class="card" id="orders"></div>
+  <div class="note">الطلبات دي متسجلة على جهازك بس، وحالتها "قيد المراجعة" لحد ما صاحب البرنامج يرد عليك على واتساب.</div>
+</div>
+<script src="shared.js"></script>
+<script>
+  // ===== عدّل الإعدادات دي =====
+  const CFG={wa:'201050176149',methods:[{n:'فودافون كاش',num:'01091151889'},{n:'إنستاباي',num:'mohamedehabsaidtag@instapay'}]};
+  const PLANS=[
+    {id:'free',n:'مجاني',m:0,y:0,f:[['كل الصفحات الأساسية',1],['مهام وعادات ومذكرات',1],['لغة واحدة نشطة',1],['نسخ احتياطي',0],['تقارير شهرية',0]]},
+    {id:'plus',n:'بلس',m:49,y:490,best:1,f:[['كل مميزات المجاني',1],['كل اللغات + مراجعة الكلمات',1],['العملاء والفواتير',1],['نسخ احتياطي',1],['تقارير شهرية',0]]},
+    {id:'pro',n:'برو',m:99,y:990,f:[['كل مميزات بلس',1],['تقارير شهرية وتحليل',1],['ثيمات حصرية',1],['أولوية في الدعم',1],['أي مميزات جديدة أول بأول',1]]}
+  ];
+
+  // تنظيف البيانات الحساسة القديمة (كلمات السر وكود المالك) من الجهاز
+  ['app-users','app-session','owner-pin'].forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});
+
+  const rd=(k,f)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?f:v}catch(e){return f}};
+  const wr=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+  let orders=rd('app-orders',[]),cycle='m',sel=null;
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const MO=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const fd=t=>{const d=new Date(t);return d.getDate()+' '+MO[d.getMonth()]+' '+d.getFullYear()};
+  const pname=id=>(PLANS.find(p=>p.id===id)||{n:id}).n;
+
+  $('nm').value=rd('app-profile',{}).name||'';
+  $('nm').onchange=()=>wr('app-profile',{name:$('nm').value.trim()});
+
+  function renderPlans(){
+    $('plans').innerHTML='';
+    PLANS.forEach(p=>{
+      const price=cycle==='m'?p.m:p.y,el=document.createElement('div');
+      el.className='card plan'+(p.best?' best':'');
+      el.innerHTML=(p.best?'<span class="tag">الأكثر طلبًا</span>':'')+'<div class="pn">'+p.n+'</div><div class="price">'+(price?price+' <small>ج.م / '+(cycle==='m'?'شهر':'سنة')+'</small>':'مجانًا')+'</div><ul>'+
+        p.f.map(f=>'<li'+(f[1]?'':' class="no"')+'>'+f[0]+'</li>').join('')+'</ul>'+
+        (p.id==='free'?'<button class="main" disabled style="opacity:.6">متاحة للجميع</button>':'<button class="main">اطلب '+p.n+'</button>');
+      const b=el.querySelector('button.main');
+      if(!b.disabled)b.onclick=()=>{sel=p.id;renderCheckout();$('checkout').scrollIntoView({behavior:'smooth'})};
+      $('plans').appendChild(el);
+    });
+  }
+
+  function renderCheckout(){
+    const c=$('checkout');
+    if(!sel){c.innerHTML='';return}
+    const p=PLANS.find(x=>x.id===sel),price=cycle==='m'?p.m:p.y;
+    c.innerHTML='<div class="card"><b>طلب اشتراك '+p.n+'</b><div class="price">'+price+' <small>ج.م</small></div>'+
+      '<select id="mth">'+CFG.methods.map((m,i)=>'<option value="'+i+'">'+m.n+'</option>').join('')+'</select>'+
+      '<div class="pay" id="pinfo"></div>'+
+      '<div class="note" style="margin:10px 0">1) حوّل المبلغ  2) خد سكرين للتحويل  3) دوس الزرار تحت وابعتها على واتساب مع كود الطلب</div>'+
+      '<div class="note" id="cerr" style="color:var(--danger);min-height:18px"></div>'+
+      '<button class="main" id="conf">حوّلت الفلوس، ابعت الطلب</button><button class="ghost" id="cn" style="margin-top:8px;width:100%">إلغاء</button></div>';
+    const info=()=>{const m=CFG.methods[$('mth').value];$('pinfo').innerHTML=m.n+': <b dir="ltr">'+esc(m.num)+'</b> <button class="copy" id="cp">نسخ</button>';$('cp').onclick=()=>{try{navigator.clipboard.writeText(m.num);$('cp').textContent='تم ✓'}catch(e){}}};
+    $('mth').onchange=info;info();
+    $('cn').onclick=()=>{sel=null;renderCheckout()};
+    $('conf').onclick=()=>{
+      const name=$('nm').value.trim();
+      if(!name){$('cerr').textContent='اكتب اسمك فوق الأول';return}
+      wr('app-profile',{name});
+      const m=CFG.methods[$('mth').value],code='ORD-'+Date.now().toString(36).toUpperCase();
+      orders.push({id:code,name,plan:sel,cycle,price,method:m.n,status:'pending',at:Date.now()});wr('app-orders',orders);
+      const msg='السلام عليكم، أنا '+name+'\nطلب اشتراك: '+p.n+' ('+(cycle==='m'?'شهري':'سنوي')+')\nالمبلغ: '+price+' ج.م\nطريقة الدفع: '+m.n+'\nكود الطلب: '+code+'\n(هبعت سكرين التحويل)';
+      window.open('https://wa.me/'+CFG.wa+'?text='+encodeURIComponent(msg),'_blank');
+      sel=null;render();
+    };
+  }
+
+  function renderOrders(){
+    const box=$('orders');
+    if(!orders.length){box.innerHTML='<div class="note">لسه معملتش أي طلب</div>';return}
+    box.innerHTML='';
+    orders.slice().reverse().forEach(o=>{
+      const r=document.createElement('div');r.className='ord';
+      r.innerHTML='<div><b>'+esc(pname(o.plan))+' • '+(o.cycle==='m'?'شهري':'سنوي')+'</b><small>'+esc(o.price)+' ج.م • '+esc(o.method)+' • '+fd(o.at)+' • '+esc(o.id)+'</small></div>'+
+        '<button class="ghost" style="font-size:12px">حذف</button>';
+      r.querySelector('button').onclick=()=>{if(confirm('تحذف الطلب ده من جهازك؟')){orders=orders.filter(x=>x.id!==o.id);wr('app-orders',orders);renderOrders()}};
+      box.appendChild(r);
+    });
+  }
+
+  document.querySelectorAll('#cycle button').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('#cycle button').forEach(x=>x.classList.remove('on'));b.classList.add('on');cycle=b.dataset.c;renderPlans();renderCheckout();
+  });
+  function render(){renderPlans();renderCheckout();renderOrders()}
+  render();
+</script>
+</body>
+</html>

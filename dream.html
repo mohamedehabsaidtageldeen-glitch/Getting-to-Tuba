@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>رحلة الحلم</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#F6F4EE;--surface:#FFF;--ink:#22301F;--ink-soft:#5C6B57;--line:#DCE0D2;--accent:#3F6B4A;--accent-soft:#E4EDDE}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Tajawal',sans-serif;display:flex;justify-content:center;padding:28px 16px 90px;min-height:100vh}
+  .page{width:100%;max-width:520px}
+  h1{font-size:26px;font-weight:900;margin:0 0 12px}
+  .motto{background:var(--accent);color:var(--bg);border-radius:14px;padding:18px;line-height:1.8;font-size:15px;margin-bottom:18px}
+  .lvl{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
+  .lvl.now{border-color:var(--accent);border-width:2px}
+  .lh{display:flex;justify-content:space-between;align-items:center;padding:14px;cursor:pointer;gap:8px}
+  .lh b{font-size:15.5px}.lh small{display:block;color:var(--ink-soft);font-size:12.5px;margin-top:2px}
+  .pct{font-weight:700;color:var(--accent);font-size:13px;white-space:nowrap}
+  .bar{height:5px;background:var(--bg)}.bar div{height:100%;background:var(--accent)}
+  .body{display:none;padding:8px 14px 14px}.lvl.open .body{display:block}
+  label{display:flex;gap:10px;align-items:flex-start;padding:8px 0;font-size:14.5px;line-height:1.5;cursor:pointer}
+  input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px;margin-top:2px;flex:none}
+  label.done span{color:var(--ink-soft);text-decoration:line-through}
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>رحلة الحلم 🚀</h1>
+  <div class="motto">أنا مش ببني حياة عشان أمتلك حد؛ أنا ببني حياة تجعلني يومًا ما قادرًا على الوقوف أمام أي حلم كشخص كامل.<br><b>كل Level لازم تكسبه بنفسك، ومحمد القديم يبقى أقل من محمد الجديد.</b></div>
+  <div id="levels"></div>
+</div>
+<script src="shared.js"></script>
+<script>
+  const KEY='dream-checks';
+  const LV=[
+   [16,'إنقاذ الدراسة وبداية البناء','تالتة إعدادي',['3–4 ساعات دراسة فعلية في أيام الدراسة','دفتر أخطاء لكل مادة','مراجعة كاملة آخر كل أسبوع','حل امتحانات سنوات سابقة قبل الامتحانات','التركي من الصفر: 30–45 دقيقة يوميًا (A1 → A2)','500–1000 كلمة تركية أساسية','4 أعمال تصميم قوية كل شهر + مشروع شخصي','أساسيات البرمجة: Python ثم HTML/CSS','ابدأ محتوى باسم Muhammed Alemdaroğlu']],
+   [17,'تحويل الهوايات لمهارات تتباع','أولى ثانوي',['درجات قوية جدًا من أول السنة','التركي A2 → B1 وتقليل الترجمة تدريجيًا','5–10 عملاء متكررين في التصميم','تعلّم التسعير والتسليم والتعديلات والاتفاقات','3 مشاريع برمجة حقيقية صغيرة','توحيد هوية السوشيال ميديا']],
+   [18,'تبقى معروف في مجالك','ثانية ثانوي',['التركي B1 → B2 (تتكلم مع تركي وتعمل Presentation)','تتحول من Graphic Designer إلى Brand Designer','اختيار تخصص برمجة مبدئي','أول مشروع باسمك (Alemdaroğlu Creative)','دخول مجتمعات المصممين والمطورين ورواد الأعمال']],
+   [19,'الثانوية والمنحة','ثالثة ثانوي',['الثانوية أولًا: أعلى نتيجة ممكنة','مراجعة شروط ومواعيد Türkiye Scholarships من الموقع الرسمي','ملف قوي: درجات + تركي + إنجليزي + Portfolio + مشاريع برمجة','ملف تحفيزي بقصة واضحة','التدرب على الاختبار والمقابلة']],
+   [20,'الوصول إلى تركيا','أول سنة',['التعامل بالتركي يوميًا','بناء علاقات مع زملاء الجامعة','اكتشاف المدينة فعلًا','بداية Freelance أو Internship','توثيق الرحلة كمحتوى']],
+   [21,'بناء الشبكة','حضور وعلاقات',['فعاليات تصميم وتقنية وريادة أعمال','معارض وفعاليات ثقافية عامة','علاقات مهنية حقيقية']],
+   [22,'صاحب البيزنس','شركة صغيرة',['فريق صغير: Designer + Developer + Marketing + Video','وكالة تصميم ← ويب ← AI/Automation ← محتوى ← منتجات رقمية','توسّع في اللي ينجح بس']],
+   [23,'الاسم والمكانة','23+',['حضور قوي على السوشيال','استقلال مادي','حياة اجتماعية ومهنية مستقرة']]
+  ];
+  let ck;try{ck=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){ck={}}
+  const age=16;
+  const box=document.getElementById('levels');
+  function render(openIdx){
+    const opened=[...box.children].map(c=>c.classList.contains('open'));
+    box.innerHTML='';
+    LV.forEach((l,i)=>{
+      const done=l[3].filter((_,j)=>ck[i+'-'+j]).length,p=Math.round(done/l[3].length*100);
+      const el=document.createElement('div');
+      el.className='lvl'+(l[0]===age?' now':'')+((opened[i]||(openIdx===undefined&&l[0]===age&&!opened.length))?' open':'');
+      el.innerHTML=`<div class="lh"><div><b>Level ${l[0]}: ${l[1]}</b><small>${l[2]}${l[0]===age?' • إنت هنا':''}</small></div><span class="pct">${p}%</span></div><div class="bar"><div style="width:${p}%"></div></div><div class="body"></div>`;
+      el.querySelector('.lh').onclick=()=>el.classList.toggle('open');
+      const b=el.querySelector('.body');
+      l[3].forEach((t,j)=>{
+        const lb=document.createElement('label');lb.className=ck[i+'-'+j]?'done':'';
+        lb.innerHTML=`<input type="checkbox" ${ck[i+'-'+j]?'checked':''}><span></span>`;
+        lb.querySelector('span').textContent=t;
+        lb.querySelector('input').onchange=e=>{ck[i+'-'+j]=e.target.checked;try{localStorage.setItem(KEY,JSON.stringify(ck))}catch(x){}render(i)};
+        b.appendChild(lb);
+      });
+      box.appendChild(el);
+    });
+  }
+  render();
+</script>
+</body>
+</html>
